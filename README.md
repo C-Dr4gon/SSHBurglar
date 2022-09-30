@@ -1,5 +1,5 @@
 # SSHRemoteControl
-> This is a penetration testing program, written in bash script, to anonymously access a weakly-protected Virtual Private Server, via Secure Shell (SSH) protocol, and copy the entire file system to the local host. . This will only work in a weakly-protected linux VPS.
+> This is a penetration testing program, written in bash script for Linux, to anonymously access a weakly-protected Virtual Private Server, via Secure Shell (SSH) protocol, and copy the entire file system to the local host. This will only work against a weakly-protected linux VPS.
 
 >
 > The brute-force attack will take a long time. If you just want to test if this program works, set your password and user as "root".
