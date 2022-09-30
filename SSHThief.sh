@@ -29,9 +29,9 @@ function INSTALL()
 	
 	### APT UPDATE
 	# update APT packages
-	sudo apt-get update
-	sudo apt-get upgrade
-	sudo apt-get dist-upgrade
+	sudo apt-get -y update
+	sudo apt-get -y upgrade
+	sudo apt-get -y dist-upgrade
 	
 	### DIRECTORY
 	# create a directory to contain output files later
