@@ -3,12 +3,17 @@
 
 > CONFIG: The brute-force attack will take a long time. If you just want to test if this program works, set your user and password as "kali".
 
-> 1. Execute SSHRemoteControl.sh with bash
+> 1. INITIATION: Execute SSHRemoteControl.sh with bash to start the script.
 
     $ bash SSHRemoteControl.sh
 
->  2. It will automatically install relevant applications:
-<img width="539" alt="start" src="https://user-images.githubusercontent.com/103941010/193277722-77ae9669-8893-4694-8128-36b33c78f866.png">
+> 2. INSTALL(): The program will automatically install relevant applications.
 
 
->  3. It will execute a brute-force attack on the VPS, and copy the entire file system of the VPS onto the local host.
+> 3. ANON(): The program will automatically execute Nipe to anonymise network traffic and conduct an anonymity test.
+
+
+> 4. SSHCRACK(): Once anonymised, the program will ask the user for the IP address of the target VPS, and execute a brute-force attack with Hydra, via SSH. The cracked users will be displayed, and the program will ask for the preferred user and password the user wants to use.
+
+
+> 5. ACCESS: The user now has access to the VPS via SSH.
