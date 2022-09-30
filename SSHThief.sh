@@ -127,7 +127,7 @@ function SSHCRACK()
 		### SELECTION OF CRACKED USER
 		read -p "[!] Enter the cracked user you want to access as: " $vpsuser
 		echo " "
-		readp -p "[!] Enter the password of the cracked user: " $vpspass
+		read -p "[!] Enter the password of the cracked user: " $vpspass
 		echo " "
 		echo "[*] Connecting to $vpsip now..."
 		
