@@ -1,6 +1,13 @@
 #!/bin/bash
 
-### OBJECTIVES: VPS REMOTE CONTROL
+###############################
+### SSHThief FUNCTIONS
+###############################
+
+# INSTALL(): automatically installs relevant applications on user host and creates relevant directories
+# ANON(): executes Nipe anonymiser and conducts and anonymity check
+# CRACK(): collects user input for VPS address and executes a hydra brute-force attack
+# SCP(): access VPS, and secure copy (scp) all the directories and files from the VPS onto the local host
 
 # 1. once executed, automatically install relevant applications
 # 2. automatically activate nipe and conduct an anonymity check
