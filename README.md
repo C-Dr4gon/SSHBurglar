@@ -14,7 +14,6 @@
 
 > 3. ANON(): The program will automatically execute Nipe to anonymise network traffic and conduct an anonymity test.
 
-><img width="217" alt="anon" src="https://user-images.githubusercontent.com/103941010/193378598-62605ecf-a32c-4afa-879d-c7815ec57bb3.png">
 
 
 > 4. SSHCRACK(): Once anonymised, the program will ask the user for the IP address of the target VPS, and execute a brute-force attack with Hydra, via SSH. The cracked users will be displayed, and the program will ask for the preferred user and password the user wants to use.
