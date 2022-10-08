@@ -234,6 +234,9 @@ function CONSOLE()
 	echo "[+] Directory created: ~/SSHBurglar/$vpsip"
 	echo " "
 	
-	### CORE EXECUTION
+	### ANON EXECUTION
 	ANON
 }
+
+### CONSOLE EXECUTION
+CONSOLE
