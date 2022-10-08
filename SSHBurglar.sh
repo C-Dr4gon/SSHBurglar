@@ -134,7 +134,7 @@ function ANON()
 	### START
 	# let the user know anonymity check is starting
 	echo " "
-	echo "[*] EXECUTION OF SSH_BREACH MODULE:"
+	echo "[*] EXECUTION OF ANON MODULE:"
 	echo " "
 	echo "[*] Conducting Anonymity Check..."
 	echo " "
