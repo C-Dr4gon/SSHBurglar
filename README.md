@@ -34,7 +34,9 @@ After installation or skipping installation, the user will arrive at a console f
 
 ![image](https://user-images.githubusercontent.com/103941010/194731197-b0cb4180-d78f-4245-8f2c-ae8ff0d476f5.png)
 
-## ANON(): The program will automatically execute Nipe to anonymise network traffic and conduct an anonymity test.
+## ANON()
+
+The program will automatically execute Nipe to anonymise network traffic and conduct an anonymity test.
 
 If the anonymiser succeeds, the user will be connecting to the VPS via a TOR-routed IP
 
@@ -44,7 +46,9 @@ If the anonymiser fails to work (likely due to your network), then the program w
 
 ![image](https://user-images.githubusercontent.com/103941010/194731160-b3a471f2-12b9-4a7c-82e6-733f479cf4d6.png)
 
-## SSH_BREACH(): After passing the anonymity test, the program will execute a brute-force attack with Hydra, via the SSH protocol on the VPS.
+## SSH_BREACH()
+
+After passing the anonymity test, the program will execute a brute-force attack with Hydra, via the SSH protocol on the VPS.
 
 If the attack succeeds, the cracked users will be displayed, and the program will ask for the preferred user and password the user wants to use.
 
