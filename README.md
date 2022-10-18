@@ -1,6 +1,6 @@
 # SSHBurglar
 
-This is a penetration testing program, written in bash script for Linux, to anonymously brute-force and access a weakly-protected Virtual Private Server, via Secure Shell (SSH) protocol. This will only work against a weakly-protected linux VPS.
+This is a penetration testing program, written in shell script, to anonymously brute-force and access a weakly-protected Virtual Private Server, via Secure Shell (SSH) protocol. This will only work against a weakly-protected linux VPS.
 
 The brute-force attack will take a long time. If you just want to test if this program works, set your user and password as "kali" for the target host
 
